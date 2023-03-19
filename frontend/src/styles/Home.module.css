@@ -1,0 +1,205 @@
+.leftToRight {
+  position: relative;
+  display: inline-flex;
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+.leftToRight::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 1px;
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  background: #ffd641;
+  transition: all 0.3s ease-in-out;
+}
+.leftToRight:hover::after {
+  width: 100%;
+}
+
+.footerHover:hover {
+  color: white;
+}
+
+.AvatarList {
+  width: 37rem;
+}
+@media (min-width: 1680px) {
+  .AvatarList {
+    width: 45rem;
+  }
+}
+.AvatarList .listWrapper {
+  transition: all 0.35s ease-out;
+}
+.AvatarList .AvatarItemWrapper {
+  flex: 0 0 3.7rem;
+  height: 3.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (min-width: 1680px) {
+  .AvatarList .AvatarItemWrapper {
+    flex: 0 0 4.5rem;
+    height: 4.5rem;
+  }
+}
+.AvatarList .AvatarItemWrapper:hover > .AvatarItem {
+  transform: scale(1.45);
+}
+.AvatarList .AvatarItemWrapper > .AvatarItem {
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: all 0.25s ease-out;
+  cursor: pointer;
+}
+@media (min-width: 1680px) {
+  .AvatarList .AvatarItemWrapper > .AvatarItem {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+@font-face {
+  font-family: "iconfont";
+  /* Project id 2775778 */
+  src: url("//at.alicdn.com/t/font_2775778_au7nh895x2.woff2?t=1630247220481")
+      format("woff2"),
+    url("//at.alicdn.com/t/font_2775778_au7nh895x2.woff?t=1630247220481")
+      format("woff"),
+    url("//at.alicdn.com/t/font_2775778_au7nh895x2.ttf?t=1630247220481")
+      format("truetype");
+}
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-download:before {
+  content: "\e66c";
+}
+.icon-code:before {
+  content: "\e6f2";
+}
+.icon-arrow-right-filling-center:before {
+  content: "\e7b5";
+}
+@keyframes jelly {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.9, 1.1);
+  }
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+  75% {
+    transform: scale(0.95, 1.05);
+  }
+}
+.AvatarEditor {
+  background: rgba(255, 255, 255, 0.1);
+}
+.AvatarEditor .divider {
+  background: rgba(255, 255, 255, 0.15);
+}
+.AvatarEditor .iconfont {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.AvatarEditor .iconfont:hover {
+  animation: jelly 0.5s;
+}
+.AvatarEditor .iconfont:hover:not(.banTip):after {
+  opacity: 1;
+  transform: translateY(0px);
+}
+.AvatarEditor .iconfont:after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 120%;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.15rem 0.75rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease-out;
+}
+.AvatarEditor .codeBlock {
+  background: #222;
+  color: #eeebff;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease-out;
+}
+.AvatarEditor .codeBlock.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+@keyframes jelly {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  25% {
+    transform: scale(0.9, 1.1);
+  }
+
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+
+  75% {
+    transform: scale(0.95, 1.05);
+  }
+}
+
+.SectionWrapper {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.SectionWrapper:hover {
+  animation: jelly 0.5s;
+}
+
+.SectionWrapper:hover:after {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+.SectionWrapper:after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 120%;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.15rem 0.75rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease-out;
+}
+
+.SectionWrapper .childrenWrapper > svg {
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+}

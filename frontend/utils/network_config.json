@@ -1,0 +1,40 @@
+[
+  {
+    "decimals": 18,
+    "symbol": "ETH",
+    "name": "Ether",
+    "path": "/network/eth.svg",
+    "wallet": "metamask.svg",
+    "tokenAddressOnRemoteChain": {
+      "Algo": "86782447"
+    }
+  },
+  {
+    "decimals": 18,
+    "symbol": "Celo",
+    "name": "Celo",
+    "path": "/network/celo.svg",
+    "wallet": "metamask.svg"
+  },
+  {
+    "decimals": 18,
+    "symbol": "Matic",
+    "name": "Ploygon",
+    "path": "/network/polygon.svg",
+    "wallet": "metamask.svg"
+  },
+  {
+    "decimals": 18,
+    "symbol": "Fantom",
+    "name": "Fantom",
+    "path": "/network/fantom.svg",
+    "wallet": "metamask.svg"
+  },
+  {
+    "decimals": 18,
+    "symbol": "Sol",
+    "name": "Solana",
+    "path": "/network/solana.svg",
+    "wallet": "metamask.svg"
+  }
+]

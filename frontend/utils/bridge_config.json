@@ -1,0 +1,14 @@
+[
+  {
+    "value": 1,
+    "name": "wormhole",
+    "icon": "/network/wormhole.png",
+    "isReady": true
+  },
+  {
+    "value": 2,
+    "name": "glitter(comming)",
+    "icon": "/network/glitter.png",
+    "isReady": false
+  }
+]
