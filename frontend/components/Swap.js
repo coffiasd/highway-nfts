@@ -3,6 +3,9 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { ethers } from 'ethers'
 import networkConfig from "../utils/network_config.json";
 import { useEffect, useState } from "react";
+import {
+    useChainModal,
+} from '@rainbow-me/rainbowkit';
 
 import styles from '../src/styles/Home.module.css';
 import Image from "next/image";
@@ -11,15 +14,26 @@ import Image from "next/image";
 import { alertService } from '../services';
 import ERC20ABI from 'erc-20-abi';
 
-const NFTs = [
-    { "image": "/azuki2.png" },
-    { "image": "/azuki2.png" },
-    { "image": "/azuki2.png" },
-    { "image": "/azuki2.png" },
-    { "image": "/azuki2.png" }
-];
+import mintJSON from '../utils/mint.json';
+import { useNetwork, useAccount } from 'wagmi'
+
+// const NFTs = [
+//     { "image": "/azuki2.png" },
+//     { "image": "/azuki2.png" },
+//     { "image": "/azuki2.png" },
+//     { "image": "/azuki2.png" },
+//     { "image": "/azuki2.png" }
+// ];
 
 export default function Swap() {
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const connectedContract = new ethers.Contract(contractAddress, mintJSON.abi, signer);
+    const { openChainModal } = useChainModal();
+    const { chain } = useNetwork();
+    const { address, isConnected } = useAccount();
+
     //button loading
     const [loading, setLoading] = useState("");
 
@@ -32,8 +46,8 @@ export default function Swap() {
     const [modalto, setModalto] = useState("");
 
     //token option
+    const [NFTs, setNFTs] = useState([]);
     const [NFT, setNFT] = useState(null);
-    const [from, setFrom] = useState(null);
     const [to, setTo] = useState(null);
 
     //swap address
@@ -45,22 +59,39 @@ export default function Swap() {
         keepAfterRouteChange: false
     }
 
+    // getNFTsList();
     useEffect(() => {
-    }, [NFT])
+        getNFTsList();
+    }, [chain])
 
     async function connectWallet(network, type) {
 
     }
 
+    async function getTokenURI(tokenId) {
+        const tokenURI = await connectedContract.tokenURI(tokenId);
+        console.log("tokenURI:", tokenURI);
+        return JSON.parse(tokenURI);
+    }
+
+    //get user NFTs list
+    async function getNFTsList() {
+        if (!address) {
+            return
+        }
+        let ret = [];
+        let list = await connectedContract.getTokenListArray(address);
+        console.log("NFTs:", list);
+        for (let i = 0; i < list.length; i++) {
+            ret.push(await getTokenURI(list[i]));
+        }
+        console.log("ret", ret);
+        setNFTs(ret);
+    }
+
     const AddresshandleChange = (event) => {
         setSwapAddress(event.target.value);
     };
-
-    //from change event.
-    async function selectfromChangeHandle(index) {
-        myModal5ClickHandle();
-        setFrom(index);
-    }
 
     //to change event.
     async function selecttoChangeHandle(index) {
@@ -129,7 +160,7 @@ export default function Swap() {
     return (
         <div className="bg-white">
 
-            <div className={`modal ${modalToken} cursor-pointer ${styles.modalSelf}`} id="my-modal-5">
+            {/* <div className={`modal ${modalToken} cursor-pointer ${styles.modalSelf}`} id="my-modal-5">
                 <div className="modal-box bg-base-100">
                     <h3 className="text-lg font-bold">Select Network</h3>
                     <div className="divider"></div>
@@ -145,7 +176,7 @@ export default function Swap() {
                         ))}
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className={`modal ${modalto} cursor-pointer ${styles.modalSelf}`} id="my-modal-6">
                 <div className="modal-box">
@@ -172,10 +203,17 @@ export default function Swap() {
                     <div className="divider"></div>
                     <div className="flex flex-wrap justify-center">
                         {NFTs.map((item, key) => (
-                            <div className="my-2 mx-2">
-                                <Image className='rounded-full' width={100} height={100} src={item.image} onClick={() => { chooseNFT(item.image) }} alt="" />
+                            <div className="my-2 mx-2 flex flex-col justify-center items-center hover:text-red-400">
+                                <div>
+                                    <Image className='rounded-full' width={100} height={100} src={item.image} onClick={() => { chooseNFT(item.image) }} alt="" />
+                                </div>
+                                <div className='mt-1'>
+                                    {item.name}
+                                </div>
                             </div>
                         ))}
+
+                        {NFTs == [] && "<>Empty List</>"}
                     </div>
 
                 </div>
@@ -197,15 +235,16 @@ export default function Swap() {
                         </span>
                         <div className="w-96 flex flex-row p-2 gap-x-32 rounded-2xl m-3">
                             <div className="w-1/2">
-                                {from != null ? (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={myModal5ClickHandle}>
+                                {chain && chain.id ? (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={openChainModal}>
                                     <div className="flex"
-                                    ><Image alt="" src={networkConfig[from].path} width={20} height={20}></Image>
+                                    >
+                                        {/* <Image alt="" src={networkConfig[from].path} width={20} height={20}></Image> */}
                                     </div>
-                                    <div className="flex-auto text-center mx-1">{networkConfig[from].name}</div>
+                                    <div className="flex-auto text-center mx-1">{chain.name}</div>
                                     <div className="flex"><BiChevronDown size="1rem" />
                                     </div>
-                                </div>) : (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl px-2 cursor-pointer" onClick={myModal5ClickHandle}>
-                                    <div className="flex-auto text-center">Network</div>
+                                </div>) : (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl px-2 cursor-pointer" onClick={openChainModal}>
+                                    <div className="flex-auto text-center">SELECT</div>
                                     <div className="flex"><BiChevronDown size="1rem" /></div>
                                 </div>)}
                             </div>
@@ -215,7 +254,7 @@ export default function Swap() {
                                     <div className="flex-1"
                                     ><Image className="rounded-full" alt="" src={NFT.Image} width={20} height={20}></Image>
                                     </div>
-                                    <div className="flex-auto text-center">NFT</div>
+                                    <div className="flex-auto ml-5">NFT</div>
                                     <div className="flex"><BiChevronDown size="1rem" />
                                     </div>
                                 </div>) : (<div className="p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={modalClick}>
@@ -254,7 +293,7 @@ export default function Swap() {
                     </div>
 
                     <div className="h-auto border-solid border-2 rounded-2xl p-2">
-                        <input type="text" placeholder="Type Receiver Address" value={swapAddress} className="font-bold text-primary input input-ghost w-full max-w-xs focus:outline-0 focus:bg-inherit focus:text-primary" onChange={AddresshandleChange} />
+                        <input type="text" placeholder="Type Receiver Address" value={swapAddress} className="text-primary input input-ghost w-full max-w-xs focus:outline-0 focus:text-primary" onChange={AddresshandleChange} />
                     </div>
 
                     <div>

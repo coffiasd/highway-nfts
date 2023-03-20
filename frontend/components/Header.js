@@ -4,18 +4,15 @@ import {
     useAccountModal,
     useChainModal,
 } from '@rainbow-me/rainbowkit';
-import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi'
-import { useRouter } from 'next/router'
+import { useAccount, useNetwork } from 'wagmi'
 import Link from 'next/link';
-import styles from '../src/styles/Home.module.css';
 
 export default function Header() {
-    const router = useRouter()
+    // const router = useRouter()
     const { openConnectModal } = useConnectModal();
     const { openAccountModal } = useAccountModal();
     const { openChainModal } = useChainModal();
     const { isConnected } = useAccount();
-    const { switchNetwork } = useSwitchNetwork()
     const { chain } = useNetwork();
 
     return (
@@ -24,21 +21,17 @@ export default function Header() {
                 <ul className='flex flex-row justify-between gap-6'>
                     <li className="cursor-pointer">
                         <Link href="/">
-                            <Image src="/eth-logo.png" width={40} height={40} />
+                            <Image src="/eth-logo.png" width={20} height={20} />
                         </Link>
                     </li>
                     <li>
-                        <Link href="/mint" className='text-black cursor-pointer ml-2 flex items-center justify-center h-10 hover:bg-accent p-2 rounded-xl'>
-                            <div className={`${styles.leftToRight}` + "text-2xl font-semibold"}>
-                                mint
-                            </div>
+                        <Link href="/mint" className='text-black text-base font-semibold cursor-pointer items-center justify-center hover:text-red-400'>
+                            Mint
                         </Link>
                     </li>
                     <li>
-                        <Link href="/swap" className='text-black cursor-pointer flex items-center justify-center h-10 hover:bg-orange-200 p-2 rounded-xl'>
-                            <div className={`${styles.leftToRight}` + "text-2xl font-semibold"}>
-                                swap
-                            </div>
+                        <Link href="/swap" className='text-black text-base font-semibold cursor-pointer items-center justify-center hover:text-red-400'>
+                            Swap
                         </Link>
                     </li>
                 </ul>
@@ -48,12 +41,12 @@ export default function Header() {
             </div>
 
             <div className="navbar-end">
-                {isConnected && chain.id != 5001 && <button className="btn btn-sm btn-warning ml-3 normal-case" onClick={() => switchNetwork(5001)}>switch net</button>}
+                {/* {isConnected && <button className="btn btn-sm btn-outline btn-warning ml-3 normal-case" onClick={() => switchNetwork()}>Switch</button>} */}
 
-                {!isConnected && (<button className="btn btn-sm btn-warning ml-3 normal-case" onClick={openConnectModal}>connect wallet</button>)}
+                {!isConnected && (<button className="btn btn-sm btn-outline btn-warning ml-3 normal-case" onClick={openConnectModal}>connect wallet</button>)}
 
-                {isConnected && chain && chain.id == 5001 &&
-                    (<><button className="btn btn-sm btn-primary ml-3 normal-case" onClick={openAccountModal}>Profile</button><button className="btn btn-sm btn-primary ml-3 normal-case " onClick={openChainModal}>Chain</button><button className="btn btn-sm btn-primary mx-3 normal-case " onClick={() => { router.push('/profile') }}>Info</button></>)
+                {isConnected && chain &&
+                    (<><button className="btn btn-sm btn-outline btn-success ml-3 normal-case" onClick={openAccountModal}>Profile</button><button className="btn btn-sm btn-outline btn-error ml-3 normal-case " onClick={openChainModal}>Chain</button></>)
                 }
             </div>
         </div >

@@ -1,0 +1,18 @@
+{
+  "name": "hardhat-project",
+  "dependencies": {
+    "@hyperlane-xyz/core": "^1.2.1",
+    "@hyperlane-xyz/sdk": "^1.2.2",
+    "@hyperlane-xyz/utils": "^1.2.2",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-etherscan": "^3.1.7",
+    "@nomiclabs/hardhat-waffle": "^2.0.5",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/contracts": "^4.8.2",
+    "@openzeppelin/contracts-upgradeable": "^4.8.2",
+    "dotenv": "^16.0.3",
+    "hardhat": "^2.13.0",
+    "hardhat-change-network": "^0.0.7"
+  }
+}

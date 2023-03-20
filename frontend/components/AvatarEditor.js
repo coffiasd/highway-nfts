@@ -169,13 +169,7 @@ export default function AvatarEditor() {
       return;
     }
 
-    if (chain.id != 80001) {
-      setIsLoading("");
-      alertService.info("please switch to mumbai net", options);
-      return;
-    }
-
-    await connectedContract.publicMint(sendCid, genCodeString(), {
+    await connectedContract.originMint(sendCid, genCodeString(), {
       value: ethers.utils.parseEther("0.01"),
       // nonce: window.ethersProvider.getTransactionCount(address, "latest"),
       gasLimit: ethers.utils.hexlify(0x100000), //100000
@@ -198,7 +192,7 @@ export default function AvatarEditor() {
   /// view on os
   const openSeaUrl = async () => {
     const id = await getTokenURI();
-    const url = "https://testnets.opensea.io/zh-CN/assets/mumbai/" + contractAddress + "/" + id;
+    const url = "https://testnets.opensea.io/zh-CN/assets/goerli/" + contractAddress + "/" + id;
     window.open(url);
   }
 
@@ -223,11 +217,11 @@ export default function AvatarEditor() {
         <div className="card glass">
           <figure><Avatar style={{ width: "10rem", height: "10rem" }} {...config} /></figure>
           <div className="card-body">
-            <h2 className="card-title">Congratulations!</h2>
-            <p>successful mint your NFT</p>
-            <div className="card-actions justify-end">
+            <h2 className="card-title">Congratulations!!</h2>
+            <p>Successful mint your NFT</p>
+            <div className="card-actions justify-center">
               <button className="btn btn-info btn-sm" onClick={() => modalClick()}>Yah</button>
-              <button className="btn btn-info btn-sm" onClick={() => openSeaUrl()}>OpenSea</button>
+              {/* <button className="btn btn-info btn-sm" onClick={() => openSeaUrl()}>OpenSea</button> */}
             </div>
           </div>
         </div>

@@ -1,7 +1,8 @@
 import '../styles/globals.css'
 import 'tailwindcss/tailwind.css'
 // switchNetwork(bssctestChain);
-import { WagmiConfig, createClient, configureChains, mainnet } from 'wagmi'
+import { WagmiConfig, createClient, configureChains } from 'wagmi'
+import { goerli, optimismGoerli, bscTestnet } from '@wagmi/core/chains'
 import { publicProvider } from 'wagmi/providers/public';
 import '@rainbow-me/rainbowkit/styles.css';
 import '../styles/Home.module.css';
@@ -12,7 +13,7 @@ import {
 } from '@rainbow-me/rainbowkit';
 
 
-const { chains, provider } = configureChains([mainnet], [publicProvider()])
+const { chains, provider } = configureChains([goerli, optimismGoerli, bscTestnet], [publicProvider()])
 const { connectors } = getDefaultWallets({
   appName: 'My RainbowKit App',
   chains
