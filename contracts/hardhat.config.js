@@ -2,28 +2,45 @@ require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 require("hardhat-change-network");
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+
+
+// task("account", "returns nonce and balance for specified address on multiple networks")
+//   .addParam("address")
+//   .setAction(async address => {
+//     const web3Goerli = createAlchemyWeb3("https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
+//     const web3OptGoerli = createAlchemyWeb3("https://goerli.optimism.io");
+//     const web3Mumbai = createAlchemyWeb3("https://rpc-mumbai.maticvigil.com");
+
+//     const networkIDArr = ["Ethereum Goerli:", "Optimism Goerli:", "Mumbai:"]
+//     const providerArr = [web3Goerli, web3OptGoerli, web3Mumbai];
+//     const resultArr = [];
+
+//     for (let i = 0; i < providerArr.length; i++) {
+//       const nonce = await providerArr[i].eth.getTransactionCount(address.address, "latest");
+//       const balance = await providerArr[i].eth.getBalance(address.address)
+//       resultArr.push([networkIDArr[i], nonce, parseFloat(providerArr[i].utils.fromWei(balance, "ether")).toFixed(2) + "ETH"]);
+//     }
+//     resultArr.unshift(["  |NETWORK|   |NONCE|   |BALANCE|  "])
+//     console.log(resultArr);
+//   });
 
 module.exports = {
   solidity: "0.8.13",
   networks: {
     mumbai: {
-      url: process.env.TESTNET_RPC,
+      url: "https://polygon-mumbai.g.alchemy.com/v2/CTbxLYqjt01dKeLpMz35-KOSyAy-WzxN",
       accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY2, process.env.PRIVATE_KEY3, process.env.PRIVATE_KEY4],
-      gas: 0,
+      gas: "auto",
+      blockGasLimit: "auto",
       chainId: 80001,
     },
     goerli: {
-      url: "https://eth-goerli.g.alchemy.com/v2/rhnU3EgZ0CP--Cv4Nh8NEhL_HJV6edRa",
+      url: "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
       accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY2, process.env.PRIVATE_KEY3, process.env.PRIVATE_KEY4],
       gas: "auto",
       chainId: 5,
       blockGasLimit: "auto",
-      // deploy: {
-      //   AwesomeCrossChainNFT: {
-      //     address: "0xf80c331aa92308ef58c9d55d49355ac3052130ad",
-      //     from: "0x52bf58425cAd0B50fFcA8Dbe5447dcE9420a2610"
-      //   },
-      // },
     },
     opgoerli: {
       url: "https://opt-goerli.g.alchemy.com/v2/LamuSp6Ak7t4BDQ2KsJ9SXqIFPPIf0nz",
@@ -31,12 +48,6 @@ module.exports = {
       gas: "auto",
       chainId: 420,
       blockGasLimit: "auto",
-      deploy: {
-        AwesomeCrossChainNFT: {
-          address: "0xf80c331aa92308ef58c9d55d49355ac3052130ad",
-          from: "0x52bf58425cAd0B50fFcA8Dbe5447dcE9420a2610"
-        },
-      },
     },
     localhost: {
       gas: "auto",

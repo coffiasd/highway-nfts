@@ -61,6 +61,9 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
         returns (bytes memory)
     {
         require(ownerOf(_tokenId) == msg.sender, "!owner");
+        //get token uri.
+        string memory tokenURL = tokenURI(_tokenId);
+        //burn id.
         _burn(_tokenId);
         //delete mapping
         uint256[] storage tokenList = OwnTokenList[msg.sender];
@@ -71,7 +74,7 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
             }
             unchecked{i++;}
         }
-        return bytes("");
+        return bytes(tokenURL);
     }
 
     /**
@@ -87,8 +90,8 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
         _safeMint(_recipient, _tokenId);
         //set token URI
         _setTokenURI(_tokenId, string(metadata));
-            //push own list
-        OwnTokenList[msg.sender].push(_tokenId);
+        //push own list
+        OwnTokenList[_recipient].push(_tokenId);
     }
 
 

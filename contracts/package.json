@@ -1,6 +1,7 @@
 {
   "name": "hardhat-project",
   "dependencies": {
+    "@alch/alchemy-web3": "^1.4.7",
     "@hyperlane-xyz/core": "^1.2.1",
     "@hyperlane-xyz/sdk": "^1.2.2",
     "@hyperlane-xyz/utils": "^1.2.2",

@@ -1,10 +1,3 @@
-//mint token
-//transfer token to _recipient
-//check origin tokenId exist if it's been burned?
-//check remote tokenId exist?
-// const {
-//     loadFixture,
-// } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 require("hardhat-change-network");
@@ -26,6 +19,7 @@ describe("AwesomeCrossChainNft", function () {
     const localDomain = 420;
     const remoteDomain = 5;
     let nft;
+
     before(async () => {
         //init nft contract.
         const MailBox = "0xCC737a94FecaeC165AbCf12dED095BB13F037685";
@@ -41,38 +35,6 @@ describe("AwesomeCrossChainNft", function () {
         console.log("deployed address:", await nft.address);
         // await nft.initialize(MailBox, InterchainGasPaymaster, NFTName, NFTSymbol);
     });
-
-    //use fixture to run this setup once, snapshot that state
-    // async function setupFixture() {
-    //     //set some user.
-    //     const [localChainMintUser, localChainOtherUser, remoteChainReceiveUser, remoteChainOtherUser] = await ethers.getSigners();
-
-    //     // //get specify user.
-    //     // const localChainMintUser = await ethers.getSigners();
-    //     console.log(localChainMintUser.address);
-
-    //     // //fund user.
-    //     // await ethers.provider.sendTransaction({
-    //     //     to: localChainMintUser,
-    //     //     value: 10e18,
-    //     // });
-
-    //     // const MailBox = "0xCC737a94FecaeC165AbCf12dED095BB13F037685";
-    //     // const InterchainGasPaymaster = "0xf857706CE59Cb7AE6df81Bbd0B0a656dB3e6beDA";
-    //     // const NFTName = "AwesomeCrossChainNFT";
-    //     // const NFTSymbol = "acc";
-    //     // const MintAmount = hre.ethers.utils.parseEther("0.01");
-    //     // const ChainId = hre.network.config.chainId;
-
-    //     // const NFT = await hre.ethers.getContractFactory("AwesomeCrossChainNFT");
-    //     // // const nft = await NFT.deploy(MintAmount, ChainId);
-    //     // const nft = await NFT.attach(CONTRACT_ADDRESS);
-    //     // // await nft.deployed();
-    //     // console.log("deployed address:", await nft.address);
-    //     // await nft.initialize(MailBox, InterchainGasPaymaster, NFTName, NFTSymbol);
-
-    //     return { localChainMintUser, localChainOtherUser, remoteChainReceiveUser, remoteChainOtherUser }
-    // }
 
     // local chain test
     describe("LocalChainTestCase", function () {
@@ -118,7 +80,7 @@ describe("AwesomeCrossChainNft", function () {
             // console.log(interchainGasPayment);
 
             //set remote router
-            // await nft.connect(localChainMintUser).enrollRemoteRouter(localDomain, utils.addressToBytes32(local));
+            //await nft.connect(localChainMintUser).enrollRemoteRouter(localDomain, utils.addressToBytes32(local));
             //transferRemote
             // const messageId = await nft.connect(localChainMintUser).transferRemote(remoteDomain, utils.addressToBytes32(remoteChainReceiveUser.address), 2, { value: interchainGasPayment });
             // console.log(messageId);
