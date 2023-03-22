@@ -26,6 +26,7 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
     ){
         _originMintPrice = originMintPrice;
         _originChainId = originChainId;
+        _tokenIdCounter.increment();
     }
 
 
@@ -63,10 +64,8 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
         require(ownerOf(_tokenId) == msg.sender, "!owner");
         //get token uri.
         string memory tokenURL = tokenURI(_tokenId);
-        //burn id.
-        _burn(_tokenId);
         //delete mapping
-        uint256[] storage tokenList = OwnTokenList[msg.sender];
+        uint256[] storage tokenList = OwnTokenList[ownerOf(_tokenId)];
         for (uint i = 0; i < tokenList.length;) {
             if (tokenList[i] == _tokenId) {
                 delete tokenList[i];
@@ -74,6 +73,8 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
             }
             unchecked{i++;}
         }
+        //burn id.
+        _burn(_tokenId);
         return bytes(tokenURL);
     }
 
@@ -98,7 +99,7 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
     /**
      * @dev publicMint
      */
-    function originMint(string calldata cid,string calldata config)
+    function originMint(string calldata cid)
         public
         payable
     {
@@ -111,7 +112,7 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         //get metadata
-        string memory tempTokenURI = getMataDataFromCid(cid, config, tokenId);
+        string memory tempTokenURI = getMataDataFromCid(cid, tokenId);
         //set token URI
         _setTokenURI(tokenId, tempTokenURI);
         //push own list
@@ -122,13 +123,12 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
      * @dev getMataDataFromCid 
      */
     function getMataDataFromCid(
-        string memory cid,
-        string memory config,
+        string calldata cid,
         uint256 tokenID
     ) internal pure returns (string memory) {
-        string memory image = string(
-            abi.encodePacked("https://", cid, ".ipfs.w3s.link/avatar.png")
-        );
+        // string memory image = string(
+        //     abi.encodePacked("https://", cid, ".ipfs.w3s.link/avatar.png")
+        // );
 
         return
             string(
@@ -137,10 +137,8 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
                     Strings.toString(tokenID),
                     '","description": "Awesome cross chain NFTs",',
                     '"image":"',
-                    image,
-                    '",'
-                    '"attributes":',
-                    config,
+                    cid,
+                    '"'
                     "}"
                 )
             );

@@ -40,8 +40,16 @@ export default function Footer() {
             <div>
                 <span className="footer-title text-black">Network</span>
                 <div className='flex flex-row cursor-pointer' onClick={addNetwork}>
-                    <div className='my-auto'><Image src="/optimism-ethereum-op-logo.png" width={30} height={30} /></div>
-                    <div className='my-auto ml-2'>Add MetaMask Network</div>
+                    <div className='my-auto'><Image src="/network/op.png" width={20} height={20} /></div>
+                    <div className='my-auto ml-2'>Add OP MetaMask</div>
+                </div>
+                <div className='flex flex-row cursor-pointer' onClick={addNetwork}>
+                    <div className='my-auto'><Image src="/network/matic.png" width={20} height={20} /></div>
+                    <div className='my-auto ml-2'>Add Mumbai MetaMask</div>
+                </div>
+                <div className='flex flex-row cursor-pointer' onClick={addNetwork}>
+                    <div className='my-auto'><Image src="/network/eth.png" width={20} height={20} /></div>
+                    <div className='my-auto ml-2'>Add Goerli MetaMask</div>
                 </div>
             </div>
             <div>

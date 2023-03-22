@@ -1,40 +1,20 @@
 [
   {
-    "decimals": 18,
-    "symbol": "ETH",
-    "name": "Ether",
-    "path": "/network/eth.svg",
-    "wallet": "metamask.svg",
-    "tokenAddressOnRemoteChain": {
-      "Algo": "86782447"
-    }
+    "id": "5",
+    "name": "Goerli",
+    "path": "/network/eth.png",
+    "contract": "0xF80C331aA92308ef58C9D55D49355AC3052130AD"
   },
   {
-    "decimals": 18,
-    "symbol": "Celo",
-    "name": "Celo",
-    "path": "/network/celo.svg",
-    "wallet": "metamask.svg"
+    "id": "420",
+    "name": "OpGoerli",
+    "path": "/network/op.png",
+    "contract": "0xEe2e98F4991d8864fbE645Ab93C5552996fdaf56"
   },
   {
-    "decimals": 18,
-    "symbol": "Matic",
-    "name": "Ploygon",
+    "id": "80001",
+    "name": "Mumbai",
     "path": "/network/polygon.svg",
-    "wallet": "metamask.svg"
-  },
-  {
-    "decimals": 18,
-    "symbol": "Fantom",
-    "name": "Fantom",
-    "path": "/network/fantom.svg",
-    "wallet": "metamask.svg"
-  },
-  {
-    "decimals": 18,
-    "symbol": "Sol",
-    "name": "Solana",
-    "path": "/network/solana.svg",
-    "wallet": "metamask.svg"
+    "contract": "0x56c9F216d7BC3126D8A74Ea7C4c837C8f3445d2C"
   }
 ]

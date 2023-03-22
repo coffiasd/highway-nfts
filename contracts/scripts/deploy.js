@@ -4,17 +4,17 @@ async function main() {
   const InterchainGasPaymaster = "0xF90cB82a76492614D07B82a7658917f3aC811Ac1";
   const NFTName = "AwesomeCrossChainNFT";
   const NFTSymbol = "acc";
-  const MintAmount = hre.ethers.utils.parseEther("0.01");
+  const MintAmount = hre.ethers.utils.parseEther("0.0001");
   const ChainId = hre.network.config.chainId;
 
   const NFT = await hre.ethers.getContractFactory("AwesomeCrossChainNFT");
   const nft = await NFT.deploy(MintAmount, ChainId);
-  // await nft.deployed();
+  await nft.deployed();
 
-  //0x15cdAeA0F60e083D5dA74BCd8A27531aF5eA91Cb  opgoerli
-  //0xF80C331aA92308ef58C9D55D49355AC3052130AD   goerli
+  //0xEe2e98F4991d8864fbE645Ab93C5552996fdaf56  opgoerli
+  //0xF023b1f74D17470BD7eC020A65376AdF3D62E8fe   mumbai
   // const NFT = await hre.ethers.getContractFactory("AwesomeCrossChainNFT");
-  // const nft = NFT.attach("0x1ae545931422BB868595d64b6d3e862b94d46Cc1");
+  // const nft = NFT.attach("0x68E099fAa7683BE97E3DCf75B3B572AB5918FAd0");
 
   console.log("deployed address:", await nft.address);
   await nft.initialize(MailBox, InterchainGasPaymaster, NFTName, NFTSymbol);

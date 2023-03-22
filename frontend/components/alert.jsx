@@ -119,7 +119,7 @@ function Alert({ id, fade }) {
     <div>
       {alerts.map((alert, index) => (
         <div
-          className="alert alert-warning shadow-lg z-50 fixed m-auto w-auto flex justify-center toast toast-start"
+          className="alert alert-warning shadow-lg z-50 mt-5 fixed m-auto w-1/4 flex justify-center toast toast-center toast-top"
           key={index}
         >
           <div>
@@ -138,7 +138,7 @@ function Alert({ id, fade }) {
             </svg>
             <span dangerouslySetInnerHTML={{ __html: alert.message }}></span>{" "}
             <FaWindowClose
-              size="1rem"
+              size="1.2rem"
               onClick={() => removeAlert(alert)}
               className="float-right"
             />

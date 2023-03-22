@@ -1,5 +1,4 @@
-import { BiSortAlt2, BiCog } from "react-icons/bi";
-import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { BiSortAlt2, BiCog, BiChevronDown, BiChevronsDown } from "react-icons/bi";
 import { ethers } from 'ethers'
 import networkConfig from "../utils/network_config.json";
 import { useEffect, useState } from "react";
@@ -9,30 +8,31 @@ import {
 
 import styles from '../src/styles/Home.module.css';
 import Image from "next/image";
-
+const { utils } = require('@hyperlane-xyz/utils');
 //alert
 import { alertService } from '../services';
-import ERC20ABI from 'erc-20-abi';
 
 import mintJSON from '../utils/mint.json';
 import { useNetwork, useAccount } from 'wagmi'
 
-// const NFTs = [
-//     { "image": "/azuki2.png" },
-//     { "image": "/azuki2.png" },
-//     { "image": "/azuki2.png" },
-//     { "image": "/azuki2.png" },
-//     { "image": "/azuki2.png" }
-// ];
 
 export default function Swap() {
-    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const connectedContract = new ethers.Contract(contractAddress, mintJSON.abi, signer);
     const { openChainModal } = useChainModal();
     const { chain } = useNetwork();
-    const { address, isConnected } = useAccount();
+    const { address } = useAccount();
+    const [max, setMax] = useState(0);
+    const [process, setProcess] = useState(0);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            if (process < max) {
+                setProcess(process + 1);
+            } else {
+                clearInterval(intervalId);
+            }
+        }, 500);
+        return () => clearInterval(intervalId);
+    }, [process, max]);
 
     //button loading
     const [loading, setLoading] = useState("");
@@ -44,10 +44,12 @@ export default function Swap() {
     const [modal, setModal] = useState("");
     const [modalToken, setModalToken] = useState("");
     const [modalto, setModalto] = useState("");
+    const [modalmsg, setModalmsg] = useState("");
 
     //token option
     const [NFTs, setNFTs] = useState([]);
     const [NFT, setNFT] = useState(null);
+    const [from, setFrom] = useState(null);
     const [to, setTo] = useState(null);
 
     //swap address
@@ -59,19 +61,119 @@ export default function Swap() {
         keepAfterRouteChange: false
     }
 
+    // alertService.info("upload success", options);
+
+    function getConnectContract() {
+        let contractAddress;
+        networkConfig.map(function (item) {
+            if (item.id == chain.id) {
+                contractAddress = item.contract;
+            }
+        });
+        /// interact with blockchain
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        return new ethers.Contract(contractAddress, mintJSON.abi, signer);
+    }
+
     // getNFTsList();
     useEffect(() => {
         getNFTsList();
-    }, [chain])
+        networkConfig.map(function (item) {
+            if (item.id == chain.id) {
+                setFrom(item);
+            }
+        });
 
-    async function connectWallet(network, type) {
+        // console.log(stage, from, to, swapAddress);
+        if (stage == 0 && from && to != null && swapAddress && NFT != null && NFT != "") {
+            setStage(1);
+        }
 
+    }, [chain, to, swapAddress, address, NFT])
+
+
+    async function waitForTransactionCompletion(txHash) {
+        let receipt = null;
+        while (!receipt) {
+            receipt = await new ethers.providers.Web3Provider(window.ethereum).getTransactionReceipt(txHash);
+            console.log("waitForTransactionCompletion", receipt);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        return receipt;
+    }
+
+    async function waitForMessageCompletion(messageId) {
+        setMax(35);
+        while (true) {
+            const baseUrl = 'https://explorer.hyperlane.xyz/api'
+            const action = 'module=message&action=get-messages'
+            const url = `${baseUrl}?${action}&origin-tx-hash=${messageId}`;
+            const response = await fetch(url, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+            const data = await response.json();
+            let ret = data.result;
+            console.log(ret);
+            if (ret.length > 0) {
+                if (ret[0].status == "pending") {
+                    setMax(65);
+                }
+                if (ret[0].status == "delivered") {
+                    setMax(100);
+                    return
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+
+    async function transferRemote() {
+        if (!ethers.utils.isAddress(address)) {
+            setSwapAddress("");
+            alertService("address invalid", options);
+            return
+        }
+        setLoading("loading");
+        console.log(from, networkConfig[to]);
+        if (from.id == networkConfig[to].id) {
+            //same network
+            const tx = await getConnectContract().transferFrom(address, swapAddress, NFT.tokenId);
+            await tx.wait();
+            setLoading("");
+        } else {
+            //remote network
+            //interchainGasPayment 
+            let interchainGasPayment = await getConnectContract().quoteGasPayment(networkConfig[to].id);
+            console.log("interchainGasPayment", interchainGasPayment);
+            console.log(NFT);
+            // const contract = new ethers.Contract(contractAddress, abi, signer);
+            const tx = await getConnectContract().transferRemote(networkConfig[to].id, utils.addressToBytes32(swapAddress), NFT.tokenId, { value: interchainGasPayment });
+            // const receipt = await waitForTransactionCompletion(tx.hash);
+            myModalMsgClickHandle();
+            setLoading("");
+            await waitForMessageCompletion(tx.hash);
+        }
+        setSwapAddress("");
+        setNFT("");
     }
 
     async function getTokenURI(tokenId) {
-        const tokenURI = await connectedContract.tokenURI(tokenId);
-        console.log("tokenURI:", tokenURI);
-        return JSON.parse(tokenURI);
+        console.log(tokenId);
+        let tokenURI;
+        try {
+            tokenURI = await getConnectContract().tokenURI(tokenId);
+        } catch (error) {
+            console.log(error);
+            return
+        }
+
+        // console.log("tokenURI:", tokenURI);
+        let tokenURIJson = JSON.parse(tokenURI);
+        tokenURIJson.image = "https://" + tokenURIJson.image + ".ipfs.w3s.link/avatar.png";
+        tokenURIJson.tokenId = tokenId.toNumber();
+        return tokenURIJson
     }
 
     //get user NFTs list
@@ -80,12 +182,13 @@ export default function Swap() {
             return
         }
         let ret = [];
-        let list = await connectedContract.getTokenListArray(address);
-        console.log("NFTs:", list);
+        let list = await getConnectContract().getTokenListArray(address);
         for (let i = 0; i < list.length; i++) {
-            ret.push(await getTokenURI(list[i]));
+            if (list[i] == 0) continue;
+            let item = await getTokenURI(list[i]);
+            if (!item) continue;
+            ret.push(item);
         }
-        console.log("ret", ret);
         setNFTs(ret);
     }
 
@@ -124,6 +227,14 @@ export default function Swap() {
         }
     }
 
+    const myModalMsgClickHandle = () => {
+        if (modalmsg == "") {
+            setModalmsg("modal-open");
+        } else {
+            setModalmsg("");
+        }
+    }
+
     window.onclick = function (event) {
         var modal5 = document.getElementById('my-modal-5');
         var modal6 = document.getElementById('my-modal-6');
@@ -143,41 +254,20 @@ export default function Swap() {
 
     function buttonHtml() {
         if (stage == 1) {
-            return <button onClick={() => { }} className={`btn btn-primary w-full normal-case my-5 rounded-xl ${loading}`}>transfer</button>
-        } else if (stage == 2) {
-            return <button onClick={() => redeemHandle(signedVAA, networkConfig[to], fromAddrs, toAddrs, alertService, setStage, setLoading, swapAmount, setfromBalance, settoBalance, fromBalance, toBalance)} className={`btn btn-primary w-full normal-case my-5 rounded-xl ${loading}`}>redeem</button>
+            return <button onClick={transferRemote} className={`btn btn-success w-full normal-case my-5 rounded-xl ${loading}`}>Transfer</button>
         } else {
             return <button disabled className="btn btn-primary w-full normal-case my-5 rounded-xl">Type Address</button>
-            // return <div className="radial-progress" style={{ "--value": 70 }}>70%</div>
         }
     }
 
-    function chooseNFT(image) {
+    function chooseNFT(item) {
         setModal("");
-        setNFT({ "Image": image });
+        setNFT(item);
+        console.log(item);
     }
 
     return (
         <div className="bg-white">
-
-            {/* <div className={`modal ${modalToken} cursor-pointer ${styles.modalSelf}`} id="my-modal-5">
-                <div className="modal-box bg-base-100">
-                    <h3 className="text-lg font-bold">Select Network</h3>
-                    <div className="divider"></div>
-                    <div className="flex flex-col">
-
-                        {networkConfig.map((item, key) => (
-                            <div className="flex flex-row cursor-pointer hover:bg-warning rounded-2xl p-1" key={key} onClick={() => selectfromChangeHandle(key)}>
-                                <div>
-                                    <Image alt="" src={item.path} width={25} height={25} />
-                                </div>
-                                <div className="ml-3 text-base">{item.name}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div> */}
-
             <div className={`modal ${modalto} cursor-pointer ${styles.modalSelf}`} id="my-modal-6">
                 <div className="modal-box">
                     <h3 className="text-lg font-bold">Select Network</h3>
@@ -200,12 +290,12 @@ export default function Swap() {
             <div className={`modal ${modal} cursor-pointer ${styles.modalSelf}`} id="my-modal">
                 <div className="modal-box">
                     <h3 className="text-lg font-bold">Select NFT</h3>
-                    <div className="divider"></div>
-                    <div className="flex flex-wrap justify-center">
+                    {/* <div className="divider"></div> */}
+                    <div className="flex flex-wrap justify-center mt-5 ">
                         {NFTs.map((item, key) => (
                             <div className="my-2 mx-2 flex flex-col justify-center items-center hover:text-red-400">
                                 <div>
-                                    <Image className='rounded-full' width={100} height={100} src={item.image} onClick={() => { chooseNFT(item.image) }} alt="" />
+                                    <Image className='rounded-full' width={100} height={100} src={item.image} onClick={() => { chooseNFT(item) }} alt="" />
                                 </div>
                                 <div className='mt-1'>
                                     {item.name}
@@ -213,13 +303,51 @@ export default function Swap() {
                             </div>
                         ))}
 
-                        {NFTs == [] && "<>Empty List</>"}
+                        {NFTs.length == 0 && <div className="alert">
+                            <div>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="stroke-current flex-shrink-0 h-6 w-6"
+                                    fill="yellow"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                    />
+                                </svg>
+                                <span>Do not hold any hyperERC721 tokens</span>
+                            </div>
+                            <div className="flex-none">
+                                <button onClick={modalClick} className="btn btn-sm btn-error btn-outline">Okay</button>
+                            </div>
+                        </div>}
                     </div>
-
                 </div>
             </div>
 
-            <div className="w-1/4 min-w-max h-auto border-solid border-2 rounded-2xl m-auto p-1 text-sm">
+            <div className={`modal ${modalmsg} cursor-pointer ${styles.modalSelf}`} id="my-modal">
+                <div className="modal-box">
+                    <h3 className="text-lg font-bold mb-3">message</h3>
+                    <div className="flex flex-col justify-center mt-5">
+                        <progress className="progress progress-info w-full" value={process} max="100"></progress>
+                        <div className='flex flex-row mt-5 justify-between mx-2'>
+                            <div>Sent</div>
+                            <div>Finalized</div>
+                            <div>Validated</div>
+                            <div>Relayed</div>
+                        </div>
+                        <div className="flex justify-end">
+                            <button onClick={myModalMsgClickHandle} className="btn btn-sm btn-primary mt-5">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="w-1/4 min-w-max h-auto border-solid border rounded-2xl m-auto p-1 text-sm">
 
                 <div className="w-full px-6 py-4">
                     <span className="text-xl">
@@ -229,35 +357,35 @@ export default function Swap() {
                 </div>
 
                 <div className="flex flex-col px-5 py-2">
-                    <div className="h-auto border-solid border-2 rounded-2xl my-5 p-2">
+                    <div className="h-auto border-solid border rounded-2xl my-5 p-2">
                         <span className="">
                             From
                         </span>
                         <div className="w-96 flex flex-row p-2 gap-x-32 rounded-2xl m-3">
                             <div className="w-1/2">
-                                {chain && chain.id ? (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={openChainModal}>
+                                {chain != null && chain.id ? (<div className="w-auto p-2 flex flex-row border-solid border rounded-2xl cursor-pointer" onClick={openChainModal}>
                                     <div className="flex"
                                     >
-                                        {/* <Image alt="" src={networkConfig[from].path} width={20} height={20}></Image> */}
+                                        <Image alt="" src={from != null && from.path} width={20} height={20}></Image>
                                     </div>
-                                    <div className="flex-auto text-center mx-1">{chain.name}</div>
+                                    <div className="flex-auto text-center mx-1">{from && from.name}</div>
                                     <div className="flex"><BiChevronDown size="1rem" />
                                     </div>
-                                </div>) : (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl px-2 cursor-pointer" onClick={openChainModal}>
+                                </div>) : (<div className="w-auto p-2 flex flex-row border-solid border rounded-2xl px-2 cursor-pointer" onClick={openChainModal}>
                                     <div className="flex-auto text-center">SELECT</div>
                                     <div className="flex"><BiChevronDown size="1rem" /></div>
                                 </div>)}
                             </div>
 
                             <div className="w-1/2">
-                                {NFT != null ? (<div className="p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={modalClick}>
+                                {NFT != null ? (<div className="p-2 flex flex-row border-solid border rounded-2xl cursor-pointer" onClick={modalClick}>
                                     <div className="flex-1"
-                                    ><Image className="rounded-full" alt="" src={NFT.Image} width={20} height={20}></Image>
+                                    ><Image className="rounded-full" alt="" src={NFT.image} width={20} height={20}></Image>
                                     </div>
                                     <div className="flex-auto ml-5">NFT</div>
                                     <div className="flex"><BiChevronDown size="1rem" />
                                     </div>
-                                </div>) : (<div className="p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={modalClick}>
+                                </div>) : (<div className="p-2 flex flex-row border-solid border rounded-2xl cursor-pointer" onClick={modalClick}>
                                     <div className="flex-auto text-center">NFT</div>
                                     <div className="flex"><BiChevronDown size="1rem" />
                                     </div>
@@ -266,25 +394,24 @@ export default function Swap() {
 
                         </div>
 
-
                     </div>
                     <div className="m-auto">
-                        <BiSortAlt2 className="cursor-pointer" size="1.4rem" />
+                        <BiChevronsDown className="" size="1.4rem" />
                     </div>
-                    <div className="h-auto border-solid border-2 rounded-2xl my-5 p-2">
+                    <div className="h-auto border-solid border rounded-2xl my-5 p-2">
                         <span className="">
                             To
                         </span>
                         <div className="flex flex-row p-2 gap-x-32 border-primary rounded-2xl m-3">
                             <div className="w-full">
-                                {to != null ? (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl cursor-pointer" onClick={myModal6ClickHandle}>
+                                {to != null ? (<div className="w-auto p-2 flex flex-row border-solid border rounded-2xl cursor-pointer" onClick={myModal6ClickHandle}>
                                     <div className="flex"
                                     ><Image alt="" src={networkConfig[to].path} width={20} height={20}></Image>
                                     </div>
                                     <div className="flex-auto text-center mx-1">{networkConfig[to].name}</div>
                                     <div className="flex"><BiChevronDown size="1rem" />
                                     </div>
-                                </div>) : (<div className="w-auto p-2 flex flex-row border-solid border-2 rounded-2xl px-2 cursor-pointer" onClick={myModal6ClickHandle}>
+                                </div>) : (<div className="w-auto p-2 flex flex-row border-solid border rounded-2xl px-2 cursor-pointer" onClick={myModal6ClickHandle}>
                                     <div className="flex-auto text-center">SELECT</div>
                                     <div className="flex"><BiChevronDown size="1rem" /></div>
                                 </div>)}
@@ -292,8 +419,8 @@ export default function Swap() {
                         </div>
                     </div>
 
-                    <div className="h-auto border-solid border-2 rounded-2xl p-2">
-                        <input type="text" placeholder="Type Receiver Address" value={swapAddress} className="text-primary input input-ghost w-full max-w-xs focus:outline-0 focus:text-primary" onChange={AddresshandleChange} />
+                    <div className="h-auto border-solid border rounded-2xl p-2">
+                        <input type="text" placeholder="Type Receiver Address" value={swapAddress} className="text-success focus:text-success input input-ghost w-full" onChange={AddresshandleChange} />
                     </div>
 
                     <div>

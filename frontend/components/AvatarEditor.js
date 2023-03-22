@@ -19,6 +19,7 @@ import { alertService } from '../services';
 import { ethers } from "ethers";
 import { useAccount, useNetwork } from 'wagmi'
 import mintJSON from '../utils/mint.json';
+import networkConfig from "../utils/network_config.json";
 
 export default function AvatarEditor() {
   /// init configs
@@ -31,11 +32,7 @@ export default function AvatarEditor() {
   const [cid, setCid] = useState("");
   const myDefaultOptions = genDefaultOptions(defaultOptions)
   const [modal, setModal] = useState("");
-  /// interact with blockchain
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const connectedContract = new ethers.Contract(contractAddress, mintJSON.abi, signer);
+
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
 
@@ -56,6 +53,19 @@ export default function AvatarEditor() {
   /// get web3.storage config token
   function getAccessToken() {
     return process.env.NEXT_PUBLIC_WEB3_STORAGE_TOKEN
+  }
+
+  function getConnectContract() {
+    let contractAddress;
+    networkConfig.map(function (item) {
+      if (item.id == chain.id) {
+        contractAddress = item.contract;
+      }
+    });
+    /// interact with blockchain
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    return new ethers.Contract(contractAddress, mintJSON.abi, signer);
   }
 
   /// get a new web3.storage client
@@ -157,7 +167,6 @@ export default function AvatarEditor() {
   const publicMint = async (sendCid) => {
     // change loading state
     setIsLoading("loading");
-
     //set timeout
     setTimeout(() => {
       setIsLoading("");
@@ -169,16 +178,29 @@ export default function AvatarEditor() {
       return;
     }
 
-    await connectedContract.originMint(sendCid, genCodeString(), {
-      value: ethers.utils.parseEther("0.01"),
+    const tx = await getConnectContract().originMint(sendCid, {
+      value: ethers.utils.parseEther("0.001"),
       // nonce: window.ethersProvider.getTransactionCount(address, "latest"),
       gasLimit: ethers.utils.hexlify(0x100000), //100000
     });
-
+    await waitForTransactionCompletion(tx.hash);
     setReadyMint(false);
     setIsLoading("");
     modalClick();
   }
+
+  async function waitForTransactionCompletion(txHash) {
+    let receipt = null;
+    while (!receipt) {
+      receipt = await new ethers.providers.Web3Provider(window.ethereum).getTransactionReceipt(txHash);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log(receipt);
+    return receipt;
+  }
+
+  waitForTransactionCompletion("0xd1d04055069be0bb441bf18c7f4a7e680165a5fa372ae501726307a0782b911a");
+
 
   /// control modal
   const modalClick = () => {
@@ -189,26 +211,19 @@ export default function AvatarEditor() {
     }
   }
 
-  /// view on os
-  const openSeaUrl = async () => {
-    const id = await getTokenURI();
-    const url = "https://testnets.opensea.io/zh-CN/assets/goerli/" + contractAddress + "/" + id;
-    window.open(url);
-  }
-
-  /// check <cid> status
-  async function checkStatus() {
-    setStatusIsLoading("loading");
-    const client = makeStorageClient()
-    const status = await client.status(cid)
-    console.log(status);
-    if (status) {
-      alertService.info("Status:" + status.pins[0].status + ",PeerId:" + status.pins[0].peerId, options);
-    } else {
-      alertService.info("not ready", options);
-    }
-    setStatusIsLoading("");
-  }
+  // /// check <cid> status
+  // async function checkStatus() {
+  //   setStatusIsLoading("loading");
+  //   const client = makeStorageClient()
+  //   const status = await client.status(cid)
+  //   console.log(status);
+  //   if (status) {
+  //     alertService.info("Status:" + status.pins[0].status + ",PeerId:" + status.pins[0].peerId, options);
+  //   } else {
+  //     alertService.info("not ready", options);
+  //   }
+  //   setStatusIsLoading("");
+  // }
 
   return (
     <div className="flex flex-col justify-center items-center bg-white">
@@ -221,7 +236,6 @@ export default function AvatarEditor() {
             <p>Successful mint your NFT</p>
             <div className="card-actions justify-center">
               <button className="btn btn-info btn-sm" onClick={() => modalClick()}>Yah</button>
-              {/* <button className="btn btn-info btn-sm" onClick={() => openSeaUrl()}>OpenSea</button> */}
             </div>
           </div>
         </div>
@@ -338,7 +352,7 @@ export default function AvatarEditor() {
       </div>
 
       <>
-        {cid ? (<button className={`btn btn-wide btn-secondary gap-2 text-gray-50 mb-10 ${statusIsLoading}`} onClick={() => checkStatus()}>Status</button>) : ""}
+        {/* {cid ? (<button className={`btn btn-wide btn-secondary gap-2 text-gray-50 mb-10 ${statusIsLoading}`} onClick={() => checkStatus()}>Status</button>) : ""} */}
       </>
     </div >
   );
