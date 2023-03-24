@@ -23,14 +23,14 @@ describe("AwesomeCrossChainNft", function () {
     const NFTName = "AwesomeCrossChainNFT";
     const NFTSymbol = "acc";
     const MintAmount = hre.ethers.utils.parseEther("0.01");
-    const ChainId = hre.network.config.chainId;
+    // const ChainId = hre.network.config.chainId;
     let nft;
 
     before(async () => {
         //init nft contract.
 
         const NFT = await hre.ethers.getContractFactory("AwesomeCrossChainNFT");
-        nft = await NFT.deploy(MintAmount, ChainId);
+        nft = await NFT.deploy(MintAmount, 2000);
         // nft = await NFT.attach(remote);
         console.log("deployed address:", await nft.address);
         // await nft.initialize(MailBox, InterchainGasPaymaster, NFTName, NFTSymbol);
@@ -39,13 +39,13 @@ describe("AwesomeCrossChainNft", function () {
     // local chain test
     describe("LocalChainTestCase", function () {
         it("Should receive mint NFT && transfer NFT", async function () {
-            const TOKEN_ID = 0;
+            const TOKEN_ID = 2001;
             //load 
             const [localChainMintUser, localChainOtherUser] = await ethers.getSigners();
             console.log(localChainMintUser.address, ethers.utils.parseEther("0.01"));
             //mint NFT
-            await nft.connect(localChainMintUser).originMint("cidd0", "config0", { value: ethers.utils.parseEther("0.01") });
-            await nft.connect(localChainMintUser).originMint("cidd1", "config1", { value: ethers.utils.parseEther("0.01") });
+            await nft.connect(localChainMintUser).originMint("cidd0", { value: ethers.utils.parseEther("0.01") });
+            await nft.connect(localChainMintUser).originMint("cidd1", { value: ethers.utils.parseEther("0.01") });
             console.log(await nft.getTokenListArray(localChainMintUser.address));
             //check balance
             expect(await nft.balanceOf(localChainMintUser.address)).to.equal(2);

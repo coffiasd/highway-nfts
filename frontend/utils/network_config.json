@@ -3,18 +3,18 @@
     "id": "5",
     "name": "Goerli",
     "path": "/network/eth.png",
-    "contract": "0xe2820F02c48888A9722CA1919f5AD61051aD61c1"
+    "contract": "0x448A2bB0A28C1e48e3553562EC050752208C8e42"
   },
   {
     "id": "420",
     "name": "OpGoerli",
     "path": "/network/op.png",
-    "contract": "0xEe2e98F4991d8864fbE645Ab93C5552996fdaf56"
+    "contract": "0xaB358fA22f9C3d2BDB47a22C49024b49192C02E5"
   },
   {
     "id": "80001",
     "name": "Mumbai",
     "path": "/network/polygon.svg",
-    "contract": "0x56c9F216d7BC3126D8A74Ea7C4c837C8f3445d2C"
+    "contract": "0xD910482D70B43607bb637ae1B14Eb8ba7866Fade"
   }
 ]

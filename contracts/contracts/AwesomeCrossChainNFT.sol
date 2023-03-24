@@ -5,28 +5,31 @@ import {TokenRouter} from "./libs/TokenRouter.sol";
 
 import {ERC721URIStorageUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 
-import "@openzeppelin/contracts/utils/Counters.sol";
+// import "@openzeppelin/contracts/utils/Counters.sol";
+import {Counters} from "./libs/Counters.sol";
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
 
     uint256 public immutable _originMintPrice;
-    uint256 private immutable _originChainId;
+    uint256 private immutable _maxId;
+
     mapping (address => uint256[]) public OwnTokenList;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
     error NotEnoughToken();
+    error ReachingMaxSupply();
 
     constructor(
         uint256 originMintPrice,
-        uint256 originChainId
+        uint256 startId
     ){
         _originMintPrice = originMintPrice;
-        _originChainId = originChainId;
-        _tokenIdCounter.increment();
+        _tokenIdCounter.set(startId);
+        _maxId = startId+999;
     }
 
 
@@ -109,6 +112,12 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
         }
 
         uint256 tokenId = _tokenIdCounter.current();
+
+        //check max id
+        if(tokenId > _maxId){
+            revert ReachingMaxSupply();
+        }
+
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
         //get metadata
@@ -126,9 +135,6 @@ contract AwesomeCrossChainNFT is ERC721URIStorageUpgradeable, TokenRouter {
         string calldata cid,
         uint256 tokenID
     ) internal pure returns (string memory) {
-        // string memory image = string(
-        //     abi.encodePacked("https://", cid, ".ipfs.w3s.link/avatar.png")
-        // );
 
         return
             string(
