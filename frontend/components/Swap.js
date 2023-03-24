@@ -17,6 +17,20 @@ import { useNetwork, useAccount } from 'wagmi'
 
 
 export default function Swap() {
+    const keyStr =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+
+    const triplet = (e1, e2, e3) =>
+        keyStr.charAt(e1 >> 2) +
+        keyStr.charAt(((e1 & 3) << 4) | (e2 >> 4)) +
+        keyStr.charAt(((e2 & 15) << 2) | (e3 >> 6)) +
+        keyStr.charAt(e3 & 63)
+
+
+    const rgbDataURL = (r, g, b) =>
+        `data:image/gif;base64,R0lGODlhAQABAPAA${triplet(0, r, g) + triplet(b, 255, 255)
+        }/yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==`;
+
     const { openChainModal } = useChainModal();
     const { chain } = useNetwork();
     const { address } = useAccount();
@@ -78,6 +92,9 @@ export default function Swap() {
 
     // getNFTsList();
     useEffect(() => {
+        if (!address) {
+            return
+        }
         getNFTsList();
         networkConfig.map(function (item) {
             if (item.id == chain.id) {
@@ -156,7 +173,7 @@ export default function Swap() {
             await waitForMessageCompletion(tx.hash);
         }
         setSwapAddress("");
-        setNFT("");
+        setNFT(null);
     }
 
     async function getTokenURI(tokenId) {
@@ -293,9 +310,9 @@ export default function Swap() {
                     {/* <div className="divider"></div> */}
                     <div className="flex flex-wrap justify-center mt-5 ">
                         {NFTs.map((item, key) => (
-                            <div className="my-2 mx-2 flex flex-col justify-center items-center hover:text-red-400">
+                            <div key={key} className="my-2 mx-2 flex flex-col justify-center items-center hover:text-red-400">
                                 <div>
-                                    <Image className='rounded-full' width={100} height={100} src={item.image} onClick={() => { chooseNFT(item) }} alt="" />
+                                    <Image className='rounded-full' blurDataURL={rgbDataURL(237, 181, 6)} placeholder="blur" width={100} height={100} src={item.image} onClick={() => { chooseNFT(item) }} alt="" />
                                 </div>
                                 <div className='mt-1'>
                                     {item.name}
@@ -305,20 +322,7 @@ export default function Swap() {
 
                         {NFTs.length == 0 && <div className="alert">
                             <div>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="stroke-current flex-shrink-0 h-6 w-6"
-                                    fill="yellow"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                    />
-                                </svg>
-                                <span>Do not hold any hyperERC721 tokens</span>
+                                <span>Do not hold any hyperERC721</span>
                             </div>
                             <div className="flex-none">
                                 <button onClick={modalClick} className="btn btn-sm btn-error btn-outline">Okay</button>
@@ -340,7 +344,7 @@ export default function Swap() {
                             <div>Relayed</div>
                         </div>
                         <div className="flex justify-end">
-                            <button onClick={myModalMsgClickHandle} className="btn btn-sm btn-primary mt-5">Close</button>
+                            <button onClick={myModalMsgClickHandle} className="btn btn-sm btn-error btn-outline mt-5">Close</button>
                         </div>
                     </div>
                 </div>
@@ -380,7 +384,7 @@ export default function Swap() {
                             <div className="w-1/2">
                                 {NFT != null ? (<div className="p-2 flex flex-row border-solid border rounded-2xl cursor-pointer" onClick={modalClick}>
                                     <div className="flex-1"
-                                    ><Image className="rounded-full" alt="" src={NFT.image} width={20} height={20}></Image>
+                                    ><Image className="rounded-full" blurDataURL={rgbDataURL(237, 181, 6)} placeholder="blur" alt="" src={NFT.image} width={20} height={20}></Image>
                                     </div>
                                     <div className="flex-auto ml-5">NFT</div>
                                     <div className="flex"><BiChevronDown size="1rem" />

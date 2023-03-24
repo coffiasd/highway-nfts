@@ -170,7 +170,7 @@ export default function AvatarEditor() {
     //set timeout
     setTimeout(() => {
       setIsLoading("");
-    }, 12000);
+    }, 22000);
 
     if (!isConnected) {
       alertService.info("please connect wallet", options);
@@ -198,9 +198,6 @@ export default function AvatarEditor() {
     console.log(receipt);
     return receipt;
   }
-
-  waitForTransactionCompletion("0xd1d04055069be0bb441bf18c7f4a7e680165a5fa372ae501726307a0782b911a");
-
 
   /// control modal
   const modalClick = () => {

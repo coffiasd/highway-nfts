@@ -18,16 +18,16 @@ describe("AwesomeCrossChainNft", function () {
     const remote = "0xcb6DdAb87576373cd973C5B6A01DEf668BB9Cd69";
     const localDomain = 420;
     const remoteDomain = 5;
+    const MailBox = "0xCC737a94FecaeC165AbCf12dED095BB13F037685";
+    const InterchainGasPaymaster = "0x8f9C3888bFC8a5B25AED115A82eCbb788b196d2a";
+    const NFTName = "AwesomeCrossChainNFT";
+    const NFTSymbol = "acc";
+    const MintAmount = hre.ethers.utils.parseEther("0.01");
+    const ChainId = hre.network.config.chainId;
     let nft;
 
     before(async () => {
         //init nft contract.
-        const MailBox = "0xCC737a94FecaeC165AbCf12dED095BB13F037685";
-        const InterchainGasPaymaster = "0x8f9C3888bFC8a5B25AED115A82eCbb788b196d2a";
-        const NFTName = "AwesomeCrossChainNFT";
-        const NFTSymbol = "acc";
-        const MintAmount = hre.ethers.utils.parseEther("0.01");
-        const ChainId = hre.network.config.chainId;
 
         const NFT = await hre.ethers.getContractFactory("AwesomeCrossChainNFT");
         nft = await NFT.deploy(MintAmount, ChainId);

@@ -1,14 +1,3 @@
-// const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
-// const { expect } = require("chai");
-// require("hardhat-change-network");
-// const {
-//     Chains,
-//     chainMetadata,
-//     InterchainGasCalculator,
-//     MultiProvider
-// } = require("@hyperlane-xyz/sdk");
-// const { utils } = require('@hyperlane-xyz/utils');
-
 async function run() {
     const NFT = await hre.ethers.getContractFactory("AwesomeCrossChainNFT");
     const nft = await NFT.attach("0xEe2e98F4991d8864fbE645Ab93C5552996fdaf56");
