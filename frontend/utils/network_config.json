@@ -21,11 +21,11 @@
     "id": "1442",
     "name": "polygoZk",
     "path": "/network/pozk.png",
-    "contract": "0x27CC77C5ba663C3170cDcEF41834bDcDfd519Dcd"
+    "contract": "0x2EEab2a64031c362D212ce0cD906aeFed439621c"
   },
   {
     "id": "534353",
-    "name": "scrollAlpha",
+    "name": "scroll",
     "path": "/network/scroll.png",
     "contract": "0xEaB08b7987fAfB772b578236c9CAd4202DD11542"
   }
