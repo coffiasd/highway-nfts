@@ -56,6 +56,13 @@ module.exports = {
       chainId: 1442,
       blockGasLimit: "auto",
     },
+    scrollAlpha: {
+      url: "https://alpha-rpc.scroll.io/l2",
+      accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY2, process.env.PRIVATE_KEY3, process.env.PRIVATE_KEY4],
+      gas: "auto",
+      chainId: 534353,
+      blockGasLimit: "auto",
+    },
     localhost: {
       gas: "auto",
       chainId: 31337,

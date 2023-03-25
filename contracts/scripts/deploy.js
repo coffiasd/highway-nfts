@@ -5,9 +5,9 @@ async function main() {
   // const MailBox = "0xCC737a94FecaeC165AbCf12dED095BB13F037685";
   // const InterchainGasPaymaster = "0xF90cB82a76492614D07B82a7658917f3aC811Ac1";
 
-  // ploygon zk 
-  const MailBox = "0x902008883C61f5e5E391265756473D4ee04Cb10E";
-  const InterchainGasPaymaster = "0xE7afAD15477e7E2c4Daa6279f4fff91F7ABdd10E";
+  // scroll alpha 
+  const MailBox = "0x289db3f6324796BA7Adc75Fd5Fd6A62A2e80f820";
+  const InterchainGasPaymaster = "0xaa35BC1F13eE1718141C88eB619911799b08A454";
 
   const NFTName = "AwesomeCrossChainNFT";
   const NFTSymbol = "acc";
