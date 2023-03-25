@@ -2,8 +2,8 @@
 
 ## Links
 
-youtube: [https://youtu.be/QD-9s4zh2rI](https://youtu.be/QD-9s4zh2rI)
-website: [highway-nfts.vercel.app](highway-nfts.vercel.app)
+- youtube: [https://youtu.be/QD-9s4zh2rI](https://youtu.be/QD-9s4zh2rI)
+- website: [highway-nfts.vercel.app](highway-nfts.vercel.app)
 
 ## Overview
 

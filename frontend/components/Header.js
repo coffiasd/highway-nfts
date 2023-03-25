@@ -1,19 +1,44 @@
 import Image from 'next/image'
+import networkConfig from "../utils/network_config.json";
 import {
     useConnectModal,
     useAccountModal,
     useChainModal,
 } from '@rainbow-me/rainbowkit';
-import { useAccount, useNetwork } from 'wagmi'
+import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi'
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { alertService } from '../services';
 
 export default function Header() {
+    //alert options
+    const options = {
+        autoClose: true,
+        keepAfterRouteChange: false
+    }
     // const router = useRouter()
     const { openConnectModal } = useConnectModal();
     const { openAccountModal } = useAccountModal();
     const { openChainModal } = useChainModal();
     const { isConnected } = useAccount();
     const { chain } = useNetwork();
+    const { switchNetwork } = useSwitchNetwork();
+    // const { chainId } = chain;
+
+    useEffect(() => {
+        let chains = [];
+        networkConfig.map(function (item, index) {
+            chains.push(Number(item.id));
+        });
+        if (chain) {
+            console.log(chains, chain);
+            if (!chains.includes(chain.id)) {
+                alertService.info("please swith to the correct network", options);
+            }
+        }
+
+    }, [chain])
+
 
     return (
         <div className="navbar bg-base-100 border-solid border-b-2">
@@ -58,11 +83,15 @@ export default function Header() {
             <div className="navbar-end">
                 {/* {isConnected && <button className="btn btn-sm btn-outline btn-warning ml-3 normal-case" onClick={() => switchNetwork()}>Switch</button>} */}
 
+                {/* {isConnected && ['id1', 'id2', 'id3'].in != 5001 && <button className="btn btn-sm btn-warning ml-3 normal-case" onClick={() => switchNetwork(5)}>switch net</button>} */}
+
                 {!isConnected && (<button className="btn btn-sm btn-outline btn-warning ml-3 normal-case" onClick={openConnectModal}>connect wallet</button>)}
 
                 {isConnected && chain &&
                     (<><button className="btn btn-sm btn-outline btn-success ml-3 normal-case" onClick={openAccountModal}>Profile</button><button className="btn btn-sm btn-outline btn-error ml-3 normal-case " onClick={openChainModal}>Chain</button></>)
                 }
+
+
             </div>
         </div >
     )

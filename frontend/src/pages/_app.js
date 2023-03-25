@@ -12,8 +12,42 @@ import {
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
 
+const scrollAlpha = {
+  id: 534353,
+  name: 'scrollAlpha',
+  network: 'scrollAlpha',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'ETH',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: {
+      'http': ['https://alpha-rpc.scroll.io/l2']
+    },
+  },
+  testnet: true,
+}
 
-const { chains, provider } = configureChains([goerli, optimismGoerli, polygonMumbai], [publicProvider()])
+
+const polygonZk = {
+  id: 1442,
+  name: 'polygonZk',
+  network: 'polygonZk',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'ETH',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: {
+      'http': ['https://rpc.public.zkevm-test.net']
+    },
+  },
+  testnet: true,
+}
+
+const { chains, provider } = configureChains([goerli, optimismGoerli, polygonMumbai, scrollAlpha, polygonZk], [publicProvider()])
 const { connectors } = getDefaultWallets({
   appName: 'My RainbowKit App',
   chains
