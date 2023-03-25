@@ -2,10 +2,15 @@
 
 ## Links
 
+youtube: [https://youtu.be/QD-9s4zh2rI](https://youtu.be/QD-9s4zh2rI)
+website: [highway-nfts.vercel.app](highway-nfts.vercel.app)
+
 ## Overview
 
 Our project is a unique application of the Hyperlane ERC721 technology, which enables the creation and transfer of non-fungible tokens (NFTs) across multiple blockchain networks. With this technology, users can mint and transfer their custom-designed avatar NFTs to any supported blockchain network in just one simple step
+
 One of the key features of our platform is the integration of IPFS, a decentralized file storage system that ensures permanent and secure storage of NFT images. This allows users to upload their avatar designs to IPFS, ensuring they will remain accessible and preserved indefinitely
+
 Our user-friendly interface simplifies the process of creating and transferring NFTs, making it accessible to both novice and experienced users. Through our platform, users can design their own unique avatar NFTs and transfer them across different blockchain networks with ease. This opens up a world of possibilities for creators, collectors, and enthusiasts who want to participate in the burgeoning NFT ecosystem
 
 ## Support Chains List
@@ -16,9 +21,11 @@ Our user-friendly interface simplifies the process of creating and transferring 
 
 ## Document tree
 
+```shell
 ├── contracts| hardhat framework
 ├── frontend | next.js framework
 ├── README.md
+```
 
 ## FlowChart
 

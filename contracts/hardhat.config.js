@@ -49,6 +49,13 @@ module.exports = {
       chainId: 420,
       blockGasLimit: "auto",
     },
+    polygonZk: {
+      url: "https://rpc.public.zkevm-test.net",
+      accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY2, process.env.PRIVATE_KEY3, process.env.PRIVATE_KEY4],
+      gas: "auto",
+      chainId: 1442,
+      blockGasLimit: "auto",
+    },
     localhost: {
       gas: "auto",
       chainId: 31337,

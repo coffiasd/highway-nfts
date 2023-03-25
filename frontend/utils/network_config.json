@@ -16,5 +16,11 @@
     "name": "Mumbai",
     "path": "/network/polygon.svg",
     "contract": "0xD910482D70B43607bb637ae1B14Eb8ba7866Fade"
+  },
+  {
+    "id": "1442",
+    "name": "polygoZk",
+    "path": "/network/pozk.png",
+    "contract": "0x27CC77C5ba663C3170cDcEF41834bDcDfd519Dcd"
   }
 ]
